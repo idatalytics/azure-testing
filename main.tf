@@ -1,26 +1,38 @@
-# 2. Configure the AzureRM Provider
+terraform {
+  required_version = ">= 0.13"
+  backend "azurerm" {
+    resource_group_name  = "REDACTED"
+    storage_account_name = "REDACTED"
+    container_name       = "tfbackend"
+    key                  = "terraform.state"
+  }
+  required_providers { #what does this mean and why is it required.
+    mongodbatlas = {
+      source = "mongodb/mongodbatlas"
+      version = "0.9.1"
+    }
+
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "2.59.0"
+    }
+  }
+}
+
 provider "azurerm" {
-  # The AzureRM Provider supports authenticating using via the Azure CLI, a Managed Identity
-  # and a Service Principal. More information on the authentication methods supported by
-  # the AzureRM Provider can be found here:
-  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#authenticating-to-azure
-
-  # The features block allows changing the behaviour of the Azure Provider, more
-  # information can be found here:
-  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/features-block
   features {}
+
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_Id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.tenant_id
 }
 
-# 3. Create a resource group
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "West Europe"
+provider "mongodbatlas" {
+  public_key  = var.mongodb_atlas_api_pub_key
+  private_key = var.mongodb_atlas_api_pri_key
 }
 
-# 4. Create a virtual network within the resource group
-resource "azurerm_virtual_network" "example" {
-  name                = "example-network"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  address_space       = ["10.0.0.0/16"]
+locals {
+  infra_version = "1.0"
 }
