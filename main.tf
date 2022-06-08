@@ -1,4 +1,4 @@
 resource "azurerm_resource_group" "rg1" {
-  name      = "testing-euclid"
+  name      = "test-euclid"
   location  = var.resource_group_location
 }
